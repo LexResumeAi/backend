@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "mysql"
+    url      = env("DATABASE_URL")
+}
+
+model Resume {
+    id              String  @id @default(uuid())
+    firstName       String
+    lastName        String
+    email           String
+    phone           String?
+    location        String?
+    portfolioUrl    String?
+    linkedinUrl     String?
+    objective       String  @db.Text
+    yearsExperience String?
+    desiredRoles    String? @db.Text
+
+    // Store complex nested data as JSON strings
+    educationJson       Json? @db.Json
+    skillsJson          Json? @db.Json
+    experienceJson      Json? @db.Json
+    projectsJson        Json? @db.Json
+    extraCurricularJson Json? @db.Json
+    leadershipJson      Json? @db.Json
+
+    // PDF filename for generated resume
+    pdfFilename String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Relation to cover letters (for future use)
+    coverLetters CoverLetter[]
+}
+
+// Adding CoverLetter model for future expansion
+model CoverLetter {
+    id          String  @id @default(uuid())
+    title       String
+    content     String  @db.LongText
+    jobTitle    String?
+    companyName String?
+
+    // Relation to resume
+    resumeId String
+    resume   Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
